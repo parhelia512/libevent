@@ -4,8 +4,10 @@
 #include "ruby.h"
 #include "ruby18_compat.h"
 
-#include <event.h>
-#include <evhttp.h>
+#include <event2/event.h>
+#include <event2/event_struct.h>
+#include <event2/http.h>
+#include <event2/http_struct.h>
 
 extern VALUE mLibevent;
 extern VALUE cLibevent_Base;
