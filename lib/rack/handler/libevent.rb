@@ -5,25 +5,29 @@ module Rack
   module Handler
     class Libevent
 
-      def self.run(app, options)
+      def self.run(app, options={})
         server = new(app, options)
         server.start
       end
 
       def self.valid_options
+        environment  = ENV['RACK_ENV'] || 'development'
+        default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
         {
+          "Host=HOST" => "Hostname to listen on (default: #{default_host})",
+          "Port=PORT" => "Port to listen on (default: 8080)",
           "timeout=TIMEOUT" => "Set the timeout for an HTTP request"
         }
       end
 
       def initialize(app, options)
         @app = app
-        
-        options[:Host] or raise ArgumentError, "Host option required"
-        options[:Port] or raise ArgumentError, "Port option required"
 
-        @host = options[:Host]
-        @port = options[:Port].to_i
+        environment  = ENV['RACK_ENV'] || 'development'
+        default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
+
+        @host = options.delete(:Host) || default_host
+        @port = options.delete(:Port) || 8080
 
         @base = ::Libevent::Base.new
         @http = ::Libevent::Http.new(@base)
@@ -92,6 +96,6 @@ module Rack
         end
       end
     end
-
+    register 'libevent', 'Rack::Handler::Libevent'
   end
 end
